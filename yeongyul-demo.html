@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>연결이 - 지식 매칭 서비스 데모</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #f0f2f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow: hidden;
+        }
+        
+        .demo-container {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .phone-container {
+            width: 320px;
+            height: 650px;
+            background: #000;
+            border-radius: 30px;
+            padding: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative;
+            transition: all 0.5s ease;
+        }
+        
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            border-radius: 22px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .status-bar {
+            height: 36px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            font-size: 12px;
+        }
+        
+        .app-header {
+            height: 50px;
+            background: #6366f1;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            color: white;
+            font-size: 14px;
+        }
+        
+        .chat-container {
+            height: calc(100% - 86px - 60px);
+            background: #f5f5f5;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        
+        .input-container {
+            height: 60px;
+            background: #fff;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            gap: 8px;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            opacity: 0;
+            animation: fadeInUp 0.5s forwards;
+        }
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+        }
+        
+        .message-user {
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .message-bubble {
+            max-width: 70%;
+            padding: 10px 14px;
+            border-radius: 18px;
+            font-size: 13px;
+            line-height: 1.4;
+            position: relative;
+        }
+        
+        .feedback-buttons {
+            position: absolute;
+            bottom: -25px;
+            right: 0;
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .message:hover .feedback-buttons {
+            opacity: 1;
+        }
+        
+        .feedback-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: white;
+            border: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .feedback-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .feedback-btn.active-like {
+            background: #10b981;
+            color: white;
+            border-color: #10b981;
+        }
+        
+        .feedback-btn.active-dislike {
+            background: #ef4444;
+            color: white;
+            border-color: #ef4444;
+        }
+        
+        .message-user .message-bubble {
+            background: #6366f1;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .message-system .message-bubble {
+            background: #e5e7eb;
+            color: #374151;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .expert-card {
+            background: white;
+            border-radius: 10px;
+            padding: 12px;
+            margin-top: 8px;
+            border: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            font-size: 12px;
+        }
+        
+        .expert-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .expert-info h4 {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .expert-info p {
+            font-size: 13px;
+            color: #6b7280;
+        }
+        
+        .typing-indicator {
+            display: inline-block;
+            padding: 15px 20px;
+            background: #e5e7eb;
+            border-radius: 20px;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #9ca3af;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 2px;
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%, 80%, 100% {
+                opacity: 0.8;
+                transform: scale(1);
+            }
+            40% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+        }
+        
+        .open-chat-room {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 400px;
+            height: 500px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            opacity: 0;
+            transition: all 0.5s ease;
+            z-index: 100;
+        }
+        
+        .open-chat-room.active {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+        
+        .chat-room-header {
+            height: 60px;
+            background: #6366f1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            color: white;
+            font-size: 14px;
+        }
+        
+        .member-list {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .member-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: #6366f1;
+        }
+        
+        .phones-wrapper {
+            position: relative;
+            width: 1400px;
+            height: 650px;
+            margin: 0 auto;
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #phone-questioner {
+            opacity: 1;
+        }
+        
+        .phone-expert {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .phone-expert.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .demo-controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            gap: 10px;
+            z-index: 200;
+        }
+        
+        .demo-btn {
+            padding: 12px 24px;
+            background: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .demo-btn:hover {
+            background: #4f46e5;
+            transform: translateY(-2px);
+        }
+        
+        .demo-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .match-animation {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            animation: matchPulse 1s ease-out;
+            z-index: 50;
+        }
+        
+        @keyframes matchPulse {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(3);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="phones-wrapper">
+        <!-- Questioner Phone -->
+        <div id="phone-questioner" class="phone-container">
+            <div class="phone-screen">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>100% 🔋</span>
+                </div>
+                <div class="app-header">
+                    <i class="fas fa-arrow-left mr-3" style="font-size: 16px;"></i>
+                    <h1 class="text-base font-bold">연결이 - 질문자</h1>
+                </div>
+                <div id="questioner-chat" class="chat-container">
+                    <!-- Messages will be added here -->
+                </div>
+                <div class="input-container">
+                    <button class="text-gray-500">
+                        <i class="fas fa-plus-circle text-2xl"></i>
+                    </button>
+                    <input id="questioner-input" type="text" placeholder="질문을 입력하세요..." 
+                           class="flex-1 px-4 py-2 bg-gray-100 rounded-full outline-none">
+                    <button class="text-blue-500">
+                        <i class="fas fa-paper-plane text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Expert 1 Phone -->
+        <div id="phone-expert-1" class="phone-container phone-expert">
+            <div class="phone-screen">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>전문가 1</span>
+                </div>
+                <div class="app-header">
+                    <h1 class="text-base font-bold">연결이 전문가</h1>
+                    <div class="relative ml-auto">
+                        <i class="fas fa-bell" style="font-size: 18px;"></i>
+                        <div class="notification-badge" style="display: none;">1</div>
+                    </div>
+                </div>
+                <div id="expert1-chat" class="chat-container">
+                    <!-- Expert 1 messages -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Expert 2 Phone -->
+        <div id="phone-expert-2" class="phone-container phone-expert">
+            <div class="phone-screen">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>전문가 2</span>
+                </div>
+                <div class="app-header">
+                    <h1 class="text-base font-bold">연결이 전문가</h1>
+                    <div class="relative ml-auto">
+                        <i class="fas fa-bell" style="font-size: 18px;"></i>
+                        <div class="notification-badge" style="display: none;">1</div>
+                    </div>
+                </div>
+                <div id="expert2-chat" class="chat-container">
+                    <!-- Expert 2 messages -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Expert 3 Phone -->
+        <div id="phone-expert-3" class="phone-container phone-expert">
+            <div class="phone-screen">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span>전문가 3</span>
+                </div>
+                <div class="app-header">
+                    <h1 class="text-base font-bold">연결이 전문가</h1>
+                    <div class="relative ml-auto">
+                        <i class="fas fa-bell" style="font-size: 18px;"></i>
+                        <div class="notification-badge" style="display: none;">1</div>
+                    </div>
+                </div>
+                <div id="expert3-chat" class="chat-container">
+                    <!-- Expert 3 messages -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Open Chat Room -->
+        <div id="open-chat-room" class="open-chat-room">
+            <div class="chat-room-header">
+                <div>
+                    <h2 class="text-lg font-bold">CMP 공정 문의</h2>
+                    <div class="member-list">
+                        <div class="member-avatar">Q</div>
+                        <div class="member-avatar">E1</div>
+                        <div id="expert3-avatar" class="member-avatar" style="display: none;">E3</div>
+                        <span class="text-sm ml-2">참여자 <span id="member-count">2</span>명</span>
+                    </div>
+                </div>
+                <i class="fas fa-times text-xl cursor-pointer" onclick="closeOpenChat()"></i>
+            </div>
+            <div id="open-chat-messages" class="chat-container" style="height: calc(100% - 60px - 60px);">
+                <!-- Open chat messages -->
+            </div>
+            <div class="input-container">
+                <input type="text" placeholder="메시지를 입력하세요..." 
+                       class="flex-1 px-4 py-2 bg-gray-100 rounded-full outline-none">
+                <button class="text-blue-500">
+                    <i class="fas fa-paper-plane text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        </div> <!-- phones-wrapper -->
+        
+        <!-- Match Animation -->
+        <div id="match-animation" class="match-animation" style="display: none;">
+            ✨
+        </div>
+    </div>
+    
+    <!-- Demo Controls -->
+    <div class="demo-controls">
+        <button class="demo-btn" onclick="startDemo()">
+            <i class="fas fa-play mr-2"></i>시작
+        </button>
+        <button class="demo-btn" onclick="resetDemo()">
+            <i class="fas fa-redo mr-2"></i>초기화
+        </button>
+    </div>
+    
+    <script src="yeongyul-demo-config.js"></script>
+    <script src="yeongyul-demo.js"></script>
+</body>
+</html>

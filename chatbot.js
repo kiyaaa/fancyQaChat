@@ -469,6 +469,7 @@ function showNotification(message) {
 
 // API calls
 function makeAPICall(method, endpoint, data) {
+    const fullUrl = API_CONFIG.BASE_URL + endpoint;
     showNotification(`API 호출: ${method} ${endpoint}`);
     
     // Simulate API response

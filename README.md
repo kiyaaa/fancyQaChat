@@ -16,10 +16,28 @@ npm install
 ```
 
 ### 2. API 서버 설정
-`app.js` 파일을 열어 API 서버 주소를 변경하세요:
+`config.js` 파일을 열어 API 서버 주소를 변경하세요:
 
 ```javascript
-const BASE_URL = 'https://your-api-server.com';  // 여기에 실제 API 서버 주소 입력
+const API_CONFIG = {
+    // Base URL configuration
+    BASE_URL: process.env.API_BASE_URL || 'https://your-api-server.com',
+    
+    // API version (필요시 변경)
+    API_VERSION: 'v1',
+    
+    // API endpoints (필요시 추가/수정)
+    ENDPOINTS: {
+        REGISTER_SPECIALTY: '/register-specialty',
+        GET_MY_SPECIALTY: '/my-specialty/{userId}',
+        // ... 기타 엔드포인트
+    }
+};
+```
+
+환경 변수를 사용하여 설정할 수도 있습니다:
+```bash
+API_BASE_URL=https://your-api-server.com npm start
 ```
 
 만약 실제 API 서버를 사용한다면, `app.js`의 `makeAPICall` 함수를 다음과 같이 수정하세요:

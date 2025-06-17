@@ -1,4 +1,3 @@
-const BASE_URL = 'https://yeongyul--yeongyeoli-dev.cdep1.samsungds.net';
 let ws = null;
 let currentQuestionId = 'Q202403150001';
 
@@ -6,7 +5,7 @@ let currentQuestionId = 'Q202403150001';
 const apiTemplates = {
     registerSpecialty: {
         method: 'POST',
-        endpoint: '/api/v1/register-specialty',
+        endpoint: 'REGISTER_SPECIALTY',
         body: {
             userId: 'U123456',
             userName: '김삼성',
@@ -21,12 +20,12 @@ const apiTemplates = {
     },
     getMySpecialty: {
         method: 'GET',
-        endpoint: '/api/v1/my-specialty/{userId}',
+        endpoint: 'GET_MY_SPECIALTY',
         params: ['userId']
     },
     askQuestion: {
         method: 'POST',
-        endpoint: '/api/v1/ask-question',
+        endpoint: 'ASK_QUESTION',
         body: {
             userId: 'U789012',
             question: 'CMP 공정 후 웨이퍼 표면에 미세 스크래치가 발생했습니다. 원인과 개선 방법을 알고 싶습니다.',
@@ -36,17 +35,17 @@ const apiTemplates = {
     },
     getMyQuestions: {
         method: 'GET',
-        endpoint: '/api/v1/my-questions/{userId}',
+        endpoint: 'GET_MY_QUESTIONS',
         params: ['userId']
     },
     getAssignedQuestions: {
         method: 'GET',
-        endpoint: '/api/v1/assigned-questions/{userId}',
+        endpoint: 'GET_ASSIGNED_QUESTIONS',
         params: ['userId']
     },
     submitAnswer: {
         method: 'POST',
-        endpoint: '/api/v1/submit-answer',
+        endpoint: 'SUBMIT_ANSWER',
         body: {
             userId: 'U123456',
             questionId: 'Q202403150001',
@@ -56,7 +55,7 @@ const apiTemplates = {
     },
     getQuestionAnswers: {
         method: 'GET',
-        endpoint: '/api/v1/question-answers/{questionId}',
+        endpoint: 'GET_QUESTION_ANSWERS',
         params: ['questionId']
     }
 };
@@ -139,19 +138,21 @@ function testAPI(apiName) {
     const template = apiTemplates[apiName];
     const userId = document.getElementById('currentUserId').value;
     
-    let endpoint = template.endpoint;
     let body = template.body;
     
-    // Replace parameters
+    // Build endpoint URL with parameters
+    const params = {};
     if (template.params) {
         template.params.forEach(param => {
             if (param === 'userId') {
-                endpoint = endpoint.replace(`{${param}}`, userId);
+                params[param] = userId;
             } else if (param === 'questionId') {
-                endpoint = endpoint.replace(`{${param}}`, currentQuestionId);
+                params[param] = currentQuestionId;
             }
         });
     }
+    
+    const endpoint = API_CONFIG.getEndpoint(template.endpoint, params);
     
     // Update userId in body if exists
     if (body && body.userId) {
@@ -166,7 +167,7 @@ function testAPI(apiName) {
 }
 
 async function makeAPICall(method, endpoint, body) {
-    const url = BASE_URL + endpoint;
+    const url = API_CONFIG.BASE_URL + endpoint;
     
     try {
         addChatMessage('🔄 요청 전송 중...', 'system');

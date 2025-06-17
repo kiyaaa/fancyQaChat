@@ -22,6 +22,10 @@ app.get('/chatbot', (req, res) => {
     res.sendFile(path.join(__dirname, 'chatbot.html'));
 });
 
+app.get('/yeongyul-demo', (req, res) => {
+    res.sendFile(path.join(__dirname, 'yeongyul-demo.html'));
+});
+
 // Start server
 app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);

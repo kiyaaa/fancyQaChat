@@ -21,7 +21,7 @@ const scenarios = {
             {
                 type: 'api',
                 method: 'POST',
-                endpoint: '/api/v1/register-specialty',
+                endpoint: API_CONFIG.getEndpoint('REGISTER_SPECIALTY'),
                 data: {
                     userId: "U123456",
                     userName: "김삼성",
@@ -55,7 +55,7 @@ const scenarios = {
             {
                 type: 'api',
                 method: 'GET',
-                endpoint: '/api/v1/assigned-questions/U123456',
+                endpoint: API_CONFIG.getEndpoint('GET_ASSIGNED_QUESTIONS', { userId: 'U123456' }),
                 delay: 9500
             },
             {
@@ -71,7 +71,7 @@ const scenarios = {
             {
                 type: 'api',
                 method: 'POST',
-                endpoint: '/api/v1/submit-answer',
+                endpoint: API_CONFIG.getEndpoint('SUBMIT_ANSWER'),
                 data: {
                     userId: "U123456",
                     questionId: "Q202403150001",
@@ -108,7 +108,7 @@ const scenarios = {
             {
                 type: 'api',
                 method: 'POST',
-                endpoint: '/api/v1/ask-question',
+                endpoint: API_CONFIG.getEndpoint('ASK_QUESTION'),
                 data: {
                     userId: "U789012",
                     question: "CMP 공정 후 웨이퍼 표면에 미세 스크래치가 발생했습니다. 원인과 개선 방법을 알고 싶습니다.",
@@ -130,7 +130,7 @@ const scenarios = {
             {
                 type: 'api',
                 method: 'GET',
-                endpoint: '/api/v1/my-questions/U789012',
+                endpoint: API_CONFIG.getEndpoint('GET_MY_QUESTIONS', { userId: 'U789012' }),
                 delay: 7500
             },
             {
@@ -157,7 +157,7 @@ const scenarios = {
             {
                 type: 'api',
                 method: 'GET',
-                endpoint: '/api/v1/question-answers/Q202403150001',
+                endpoint: API_CONFIG.getEndpoint('GET_QUESTION_ANSWERS', { questionId: 'Q202403150001' }),
                 delay: 13500
             },
             {
@@ -193,7 +193,7 @@ const scenarios = {
             {
                 type: 'api',
                 method: 'POST',
-                endpoint: '/api/v1/register-specialty',
+                endpoint: API_CONFIG.getEndpoint('REGISTER_SPECIALTY'),
                 data: {
                     userId: "U555555",
                     userName: "이공정",
@@ -216,7 +216,7 @@ const scenarios = {
             {
                 type: 'api',
                 method: 'POST',
-                endpoint: '/api/v1/ask-question',
+                endpoint: API_CONFIG.getEndpoint('ASK_QUESTION'),
                 data: {
                     userId: "U999999",
                     question: "CVD 공정 중 파티클 발생이 증가했습니다. 원인 분석이 필요합니다.",
@@ -239,7 +239,7 @@ const scenarios = {
             {
                 type: 'api',
                 method: 'GET',
-                endpoint: '/api/v1/assigned-questions/U555555',
+                endpoint: API_CONFIG.getEndpoint('GET_ASSIGNED_QUESTIONS', { userId: 'U555555' }),
                 delay: 12000
             },
             {
@@ -255,7 +255,7 @@ const scenarios = {
             {
                 type: 'api',
                 method: 'POST',
-                endpoint: '/api/v1/submit-answer',
+                endpoint: API_CONFIG.getEndpoint('SUBMIT_ANSWER'),
                 data: {
                     userId: "U555555",
                     questionId: "Q202403150002",
